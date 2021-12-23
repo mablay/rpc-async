@@ -16,12 +16,7 @@ server.on('error', (err) => log(`server error:\n${err.stack}`))
 server.on('listening', async () => {
   const address = server.address()
   log(`listening ${address.address}:${address.port}`)
-
-  // const rpc = Rpc.fromUdpSocket(client)
-  const rpc = new Rpc({
-    send: req => server.send(JSON.stringify(req), remotePort, '127.0.0.1'),
-    attach: route => server.on('message', msg => route(JSON.parse(msg)))
-  })
+  const rpc = Rpc.fromUdpSocketJSON(server, remotePort, '127.0.0.1')
 
   if (cluster.isPrimary) {
     // Alice

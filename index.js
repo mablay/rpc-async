@@ -3,15 +3,16 @@ import { EventEmitter } from '@occami/events'
 // const log = (...args) => console.log(process.name || Date.now(), '|  RPC |', ...args)
 const log = () => {}
 
-class RpcError extends Error {
-  constructor ({ name, message }) {
-    super(`${name}: ${message} (remote stack)`)
-    // this.name = name
-    // this.stack = `${name}: ${message} (remote stack)`
-  }
-}
-
 export class Rpc extends EventEmitter {
+  static fromUdpSocketJSON (socket, port, host) {
+    return new Rpc({
+      send: data => socket.send(data, port, host),
+      attach: route => socket.on('message', data => route(data)),
+      encode: JSON.stringify,
+      decode: JSON.parse
+    })
+  }
+
   static fromEventEmitters (a, b) {
     return new Rpc({
       send: req => b.emit('rpc', req),
@@ -26,13 +27,16 @@ export class Rpc extends EventEmitter {
     })
   }
 
-  constructor ({ send, attach }) {
+  constructor ({ send, attach, encode, decode, idgen }) {
     super()
     this.timeout = 30000 // 30s as default timeout for requests
     this.resMap = new Map() // maps responsed to requests
-    this.$send = send // user defined "send"
-    attach(payload => this.route(payload)) // user defined "receive"
+    if (encode === undefined) encode = x => x
+    if (decode === undefined) decode = x => x
+    this.$send = payload => send(encode(payload)) // user defined "send"
+    attach(payload => this.route(decode(payload))) // user defined "receive"
     this.request = promisify(this.request) // <-- mutates member!
+    this.idgen = (typeof idgen === 'function') ? idgen : () => Math.random().toString(36).slice(2)
   }
 
   /* send message, not expecting a response */
@@ -55,20 +59,19 @@ export class Rpc extends EventEmitter {
   
   /* send message that expects a response */
   request (method, params, timeoutms, cb) {
+    const id = this.idgen()
     if (typeof timeoutms === 'function') {
       cb = timeoutms
       timeoutms = this.timeout
     }
     log(`send: ${method}(`, params, ')')
-    const id = Math.random().toString(36).slice(2) // ...maybe not in production
     const timeout = setTimeout(() => {
       log(`timeout: "${method}"`)
       clearTimeout(timeout)
       cb(new Error(`RpcAsync request "${method}" timed out!`))
     }, timeoutms)
     this.resMap.set(id, { cb, timeout })
-    const req = { id, method, params }
-    this.$send(req)
+    this.$send({ id, method, params })
   }
 
   // route incomming messages (notification, request, response)
@@ -129,3 +132,8 @@ export class Rpc extends EventEmitter {
   }
 }
 
+class RpcError extends Error {
+  constructor ({ name, message }) {
+    super(`${name}: ${message} (remote stack)`)
+  }
+}
