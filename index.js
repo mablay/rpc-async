@@ -1,4 +1,3 @@
-import { promisify } from 'util'
 import { EventEmitter } from '@occami/events'
 // const log = (...args) => console.log(process.name || Date.now(), '|  RPC |', ...args)
 const log = () => {}
@@ -7,7 +6,10 @@ export class Rpc extends EventEmitter {
   static fromUdpSocketJSON (socket, port, host) {
     return new Rpc({
       send: data => socket.send(data, port, host),
-      attach: route => socket.on('message', data => route(data)),
+      attach: route => {
+        socket.on('message', route)
+        return () => socket.removeListener('message', route)
+      },
       encode: JSON.stringify,
       decode: JSON.parse
     })
@@ -16,14 +18,20 @@ export class Rpc extends EventEmitter {
   static fromEventEmitters (a, b) {
     return new Rpc({
       send: req => b.emit('rpc', req),
-      attach: route => a.on('rpc', route)
+      attach: route => {
+        a.on('rpc', route)
+        return () => a.removeListener('rpc', route)
+      }
     })
   }
 
   static fromIpcProcess (proc) {
     return new Rpc({
       send: req => proc.send(req),
-      attach: route => proc.on('message', route)
+      attach: route => {
+        proc.on('message', route)
+        return () => proc.removeListener('message', route)
+      }
     })
   }
 
@@ -34,8 +42,8 @@ export class Rpc extends EventEmitter {
     if (encode === undefined) encode = x => x
     if (decode === undefined) decode = x => x
     this.$send = payload => send(encode(payload)) // user defined "send"
-    attach(payload => this.route(decode(payload))) // user defined "receive"
-    this.request = promisify(this.request) // <-- mutates member!
+    this.detach = attach(payload => this.route(decode(payload))) // user defined "receive"
+    // this.request = promisify(this.request) // <-- mutates member!
     this.idgen = (typeof idgen === 'function') ? idgen : () => Math.random().toString(36).slice(2)
   }
 
@@ -45,26 +53,18 @@ export class Rpc extends EventEmitter {
   }
 
   /* send message that expects a response */
-  // request (method, params) {
-  //   return new Promise((resolve, reject) => {
-  //     this.$request(method, params, (error, result) => {
-  //       if (error) {
-  //         reject(error)
-  //       } else {
-  //         resolve(result)
-  //       }
-  //     })
-  //   })
-  // }
+  request (method, params, timeoutms = this.timeout) {
+    return new Promise((resolve, reject) => {
+      this.$request(method, params, timeoutms, (error, result) => {
+        error ? reject(error) : resolve(result)
+      })
+    })
+  }
   
   /* send message that expects a response */
-  request (method, params, timeoutms, cb) {
+  $request (method, params, timeoutms, cb) {
     const id = this.idgen()
-    if (typeof timeoutms === 'function') {
-      cb = timeoutms
-      timeoutms = this.timeout
-    }
-    log(`send: ${method}(`, params, ')')
+    log(`send: ${method}(`, params, ') with timeout:', timeoutms)
     const timeout = setTimeout(() => {
       log(`timeout: "${method}"`)
       clearTimeout(timeout)
@@ -128,6 +128,9 @@ export class Rpc extends EventEmitter {
   close () {
     for (const { cb } of this.resMap.values()) {
       cb('RpcClosing')
+    }
+    if (typeof this.detach === 'function') {
+      this.detach()
     }
   }
 }
