@@ -14,9 +14,23 @@ Features
 ## Usage
 
 ### Inter process communication
-`ipc-parent.js`
+`parent.js`
 ```js
-import RPC from 'rpc-async'
+import { Rpc } from '../index.js'
+import { fork } from 'child_process'
+const child = fork('./example/ipc-child.js')
+const rpc = Rpc.fromIpcProcess(child)
+rpc.handle('add', ([a, b]) => a + b) // also works with async functions
+```
+
+`child.js`
+```js
+import { Rpc } from '../index.js'
+const rpc = Rpc.fromIpcProcess(process)
+rpc.request('add', [3, 5]).then(sum => {
+  console.log('3 + 5 =', sum)
+  process.exit()
+})
 ```
 
 
