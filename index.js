@@ -37,7 +37,7 @@ export class Rpc extends EventEmitter {
 
   /* send message, not expecting a response */
   notify (method, params) {
-    this.$send({ method, params })
+    return this.$send({ method, params })
   }
 
   /* send message that expects a response */
@@ -119,6 +119,13 @@ export class Rpc extends EventEmitter {
         cb({ name, message, stack })
       }
     })
+  }
+
+  /* will reject all pending requests and close the underlying communication if defined */
+  close () {
+    for (const { cb } of this.resMap.values()) {
+      cb('RpcClosing')
+    }
   }
 }
 
