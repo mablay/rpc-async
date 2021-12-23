@@ -1,0 +1,38 @@
+{
+  "name": "rpc-async",
+  "version": "0.1.0",
+  "description": "Augments async communication with RPC functionality (ws, events, ipc, ...)",
+  "main": "index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=8"
+  },
+  "dependencies": {
+    "@occami/events": "^0.1.16"
+  },
+  "devDependencies": {
+    "pta": "^1.0.2"
+  },
+  "scripts": {
+    "test": "pta test/*.{spec,test}.js",
+    "cloc": "npx clock index.js",
+    "coverage": "npx c8 pta",
+    "packlist": "npx npm-packlist",
+    "deploy": "./publish.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mablay/rpc-async.git"
+  },
+  "keywords": [
+    "rpc",
+    "async",
+    "es6"
+  ],
+  "author": "marc.ablay@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mablay/rpc-async/issues"
+  },
+  "homepage": "https://github.com/mablay/rpc-async#readme"
+}

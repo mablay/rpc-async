@@ -1,0 +1,13 @@
+tsconfig.json
+.gitignore
+.npmignore
+.github
+publish.sh
+/test
+/node_modules
+*.ts
+!*.d.ts
+*.map
+.vscode
+/coverage
+*.log

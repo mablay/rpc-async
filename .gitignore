@@ -1,0 +1,9 @@
+.DS_Store
+node_modules
+*.d.ts
+*.d.ts.map
+*.js.map
+!*.spec.js
+.vscode
+/coverage
+*.log
