@@ -3,9 +3,9 @@ import { EventEmitter } from '@occami/events'
 const log = () => {}
 
 export class Rpc extends EventEmitter {
-  static fromUdpSocketJSON (socket, port, host) {
+  static fromSocketJSON (socket) {
     return new Rpc({
-      send: data => socket.send(data, port, host),
+      send: data => socket.send(data),
       attach: route => {
         socket.on('message', route)
         return () => socket.removeListener('message', route)

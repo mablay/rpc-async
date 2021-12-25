@@ -8,10 +8,10 @@ const clair = { port: 42545 }
 alice.socket = dgram.createSocket('udp4').bind(alice.port, 'localhost', () => {
   clair.socket = dgram.createSocket('udp4').bind(clair.port, 'localhost', () => {
     clair.socket.connect(alice.port, 'localhost', () => {
-      clair.rpc = Rpc.fromUdpSocketJSON(clair.socket)
+      clair.rpc = Rpc.fromSocketJSON(clair.socket)
       clair.rpc.handle('chat', msg => console.log('Clair | received:', msg))
       alice.socket.connect(clair.port, 'localhost', () => {
-        alice.rpc = Rpc.fromUdpSocketJSON(alice.socket)
+        alice.rpc = Rpc.fromSocketJSON(alice.socket)
         alice.rpc.handle('add', ([a, b]) => a + b)
         ready()
       })
