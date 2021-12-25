@@ -1,6 +1,5 @@
 import dgram from 'dgram'
 import { Rpc } from '../index.js'
-import { promisify } from 'util'
 
 const alice = { port: 42544 }
 const clair = { port: 42545 }
