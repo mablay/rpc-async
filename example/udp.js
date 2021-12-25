@@ -1,41 +1,31 @@
-import cluster from 'cluster'
 import dgram from 'dgram'
 import { Rpc } from '../index.js'
 import { promisify } from 'util'
 
-const [name, port, remotePort] = cluster.isPrimary
-  ? ['Alice', 42544, 42545]
-  : ['Bob  ', 42545, 42544]
-const log = (...args) => console.log(name, '|', ...args)
+const alice = { port: 42544 }
+const clair = { port: 42545 }
 
-const server = dgram.createSocket('udp4').bind(port, 'localhost')
-server.send = promisify(server.send)
-server.on('error', (err) => log(`server error:\n${err.stack}`))
-// server.on('message', (msg, rinfo) => log(`received: ${msg} from ${rinfo.address}:${rinfo.port}`))
-
-server.on('listening', async () => {
-  const address = server.address()
-  log(`listening ${address.address}:${address.port}`)
-  const rpc = Rpc.fromUdpSocketJSON(server, remotePort, '127.0.0.1')
-
-  if (cluster.isPrimary) {
-    // Alice
-    rpc.handle('chat', msg => {
-      log('🔔 chat >', msg)
-      rpc.notify('chat', 'me too!')
+alice.socket = dgram.createSocket('udp4').bind(alice.port, 'localhost', () => {
+  clair.socket = dgram.createSocket('udp4').bind(clair.port, 'localhost', () => {
+    clair.socket.connect(alice.port, 'localhost', () => {
+      clair.rpc = Rpc.fromUdpSocketJSON(clair.socket)
+      clair.rpc.handle('chat', msg => console.log('Clair | received:', msg))
+      alice.socket.connect(clair.port, 'localhost', () => {
+        alice.rpc = Rpc.fromUdpSocketJSON(alice.socket)
+        alice.rpc.handle('add', ([a, b]) => a + b)
+        ready()
+      })
     })
-    rpc.handle('add', ([a, b]) => (a + b))
-    rpc.handle('exit', () => {
-      log('🔔 exit')
-      process.exit()
-    })
-    cluster.fork()
-  } else {
-    // Bob
-    rpc.handle('chat', msg => log('🔔 chat >', msg))
-    await rpc.notify('chat', 'feeling awesome!')
-    const res = await rpc.request('add', [3, 5], 5000)
-    log('🙇 add(3, 5) =', res)
-    await rpc.notify('exit')
-  }
-})  
+  })
+})
+
+async function ready () {
+  console.log('Clair connected to Alice')
+  alice.rpc.notify('chat', 'Hi Clair!')
+  const answer = await clair.rpc.request('add', [7, -3])
+  console.log('Alice | received: 7 - 3 =', answer)
+  clair.rpc.close()
+  alice.rpc.close()
+  clair.socket.close()
+  alice.socket.close()
+}
