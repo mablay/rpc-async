@@ -6,10 +6,10 @@ Inspired by [dnode](https://www.npmjs.com/package/dnode), [jayson](https://www.n
 
 Features
 
-* Bidirectional async RPC (as long as the base communication is bidirectional)
+* Turns `.send(msg)` + `.on('message', responseHandler)` into `const response = await rpc.request()`
 * custom message encoding
 * NodeJS / Browser support
-* Streaming
+* Tested with WebSockets, EventEmitters, inter-process-communication, bidirectional UDP
 
 ## Usage
 
