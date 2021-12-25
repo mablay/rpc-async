@@ -2,6 +2,14 @@ import { EventEmitter } from '@occami/events'
 // const log = (...args) => console.log(process.name || Date.now(), '|  RPC |', ...args)
 const log = () => {}
 
+/*
+  EventEmitter is NodeJS native and not available in the browser.
+  The popular 'events' module solves that, but it, but we don't need
+  80kb of code for such a simple thing. So we went for '@occami/events'
+  The browser native EventTarget class is available in NodeJS since v14.5.
+  But it has a lot of business logic involved. Maybe a benchmark will show
+  if we can ditch @occami/events for it.
+*/
 export class Rpc extends EventEmitter {
   static fromSocketJSON (socket) {
     return new Rpc({
@@ -21,6 +29,25 @@ export class Rpc extends EventEmitter {
       attach: route => {
         a.on('rpc', route)
         return () => a.removeListener('rpc', route)
+      }
+    })
+  }
+
+  // EventTarget & Event are native to the browser.
+  // NodeJS introduced them in v14.5
+  static fromEventTargets (a, b) {
+    class CustomEvent extends Event { 
+      constructor(message, data) {
+        super(message)
+        this.detail = data
+      }
+    }    
+    return new Rpc({
+      send: data => b.dispatchEvent(new CustomEvent('rpc', data)),
+      attach: route => {
+        const etRoute = (ev => route(ev.detail))
+        a.addEventListener('rpc', etRoute)
+        return () => a.removeEventListener('rpc', etRoute)
       }
     })
   }
