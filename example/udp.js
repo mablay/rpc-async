@@ -4,6 +4,7 @@ import { Rpc } from '../index.js'
 const alice = { port: 42544 }
 const clair = { port: 42545 }
 
+// setup bidirectional UDP connection and RPC handlers
 alice.socket = dgram.createSocket('udp4').bind(alice.port, 'localhost', () => {
   clair.socket = dgram.createSocket('udp4').bind(clair.port, 'localhost', () => {
     clair.socket.connect(alice.port, 'localhost', () => {

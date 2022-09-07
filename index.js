@@ -11,6 +11,13 @@ const log = () => {}
   if we can ditch @occami/events for it.
 */
 export class Rpc extends EventEmitter {
+  static fromWebWorker (worker) {
+    return new Rpc({
+      send: data => worker.postMessage(data),
+      attach: route => worker.addEventListener('message', event => route(event.data))
+    })  
+  }
+  
   static fromSocketJSON (socket) {
     return new Rpc({
       send: data => socket.send(data),
