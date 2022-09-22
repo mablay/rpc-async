@@ -49,6 +49,7 @@ This RPC protocol defines 4 different message types.
 
 
 ### Transport serialisation format (JSON example)
+This is how it works under the hood.
 
 ```mermaid
 sequenceDiagram
