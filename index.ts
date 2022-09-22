@@ -1,6 +1,24 @@
 import { EventEmitter } from '@occami/events'
 // const log = (...args) => console.log(process.name || Date.now(), '|  RPC |', ...args)
-const log = () => {}
+const log = (...args:any[]) => {}
+
+export type RpcOptions = {
+  send: SendFn
+  /** if it returns a function, this function is used to disconnect from the underlying connection */
+  attach: (route: any) => any
+  encode?: (input: any) => any
+  decode?: (output: any) => any
+  idgen?: () => string
+}
+
+type SendFn = (data: any) => any
+
+export type ResponseMapValue = {
+  cb: Callback
+  timeout: number
+}
+
+export type Callback = (err?: any, value?: any) => void
 
 /*
   EventEmitter is NodeJS native and not available in the browser.
@@ -11,7 +29,7 @@ const log = () => {}
   if we can ditch @occami/events for it.
 */
 export class Rpc extends EventEmitter {
-  static fromWebWorker (worker) {
+  static fromWebWorker (worker: any) {
     return new Rpc({
       send: data => worker.postMessage(data),
       attach: route => worker.addEventListener('message', event => route(event.data))
@@ -43,7 +61,8 @@ export class Rpc extends EventEmitter {
   // EventTarget & Event are native to the browser.
   // NodeJS introduced them in v14.5
   static fromEventTargets (a, b) {
-    class CustomEvent extends Event { 
+    class CustomEvent extends Event {
+      detail: any
       constructor(message, data) {
         super(message)
         this.detail = data
@@ -69,20 +88,27 @@ export class Rpc extends EventEmitter {
     })
   }
 
-  constructor ({ send, attach, encode, decode, idgen }) {
+  timeout: number
+  resMap: Map<string, ResponseMapValue>
+  $send: (payload: any) => SendFn
+  detach: () => void
+  idgen: () => string
+
+  constructor (options: RpcOptions) {
     super()
     this.timeout = 30000 // 30s as default timeout for requests
     this.resMap = new Map() // maps responsed to requests
-    if (encode === undefined) encode = x => x
-    if (decode === undefined) decode = x => x
-    this.$send = payload => send(encode(payload)) // user defined "send"
-    this.detach = attach(payload => this.route(decode(payload))) // user defined "receive"
-    // this.request = promisify(this.request) // <-- mutates member!
+    const { send, attach, idgen } = options
+    const encode = (typeof options.encode === 'function') ? options.encode : (x:any) => x
+    const decode = (typeof options.decode === 'function') ? options.decode : (x:any) => x
     this.idgen = (typeof idgen === 'function') ? idgen : () => Math.random().toString(36).slice(2)
+    this.$send = payload => send(encode(payload)) // user defined "send"
+    this.detach = attach((payload: any) => this.route(decode(payload))) // user defined "receive"
+    // this.request = promisify(this.request) // <-- mutates member!
   }
 
   /* send message, not expecting a response */
-  notify (method, params) {
+  notify (method: string, params: any) {
     return this.$send({ method, params })
   }
 
@@ -109,7 +135,7 @@ export class Rpc extends EventEmitter {
   }
 
   // route incomming messages (notification, request, response)
-  route (payload) {
+  route (payload: any) {
     log('route', payload)
     const { id, method, params, result, error } = payload
     if (result || error) {
@@ -134,7 +160,7 @@ export class Rpc extends EventEmitter {
     } else {
       // invalid
       const err = new Error('Invalid RPC message!')
-      err.rpcMessage = payload
+      err.message = payload
       throw err
     }
   }
@@ -152,7 +178,7 @@ export class Rpc extends EventEmitter {
         const result = await fn(params)
         cb(undefined, result)
       } catch (error) {
-        const { name, message, stack } = error
+        const { name, message, stack } = <any>error
         cb({ name, message, stack })
       }
     })
