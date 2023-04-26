@@ -5,6 +5,7 @@ tsconfig.json
 .github
 publish.sh
 /test
+/example
 /node_modules
 *.ts
 !*.d.ts
