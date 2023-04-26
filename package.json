@@ -1,6 +1,6 @@
 {
   "name": "rpc-async",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Augments async communication with RPC functionality (ws, events, ipc, ...)",
   "main": "index.js",
   "types": "index.d.ts",
