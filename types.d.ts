@@ -18,7 +18,7 @@ namespace RPC {
         ? Awaited<ReturnType<T[P]>> extends void ? never : P
         : ReturnType<T[P]> extends void ? never : P
       : never
-    ]: ReturnType<T[P]> extends Promise
+    ]: ReturnType<T[P]> extends Promise<any>
       ? T[P]
       : (...args: Parameters<T[P]>) => Promise<ReturnType<T[P]>>
   }

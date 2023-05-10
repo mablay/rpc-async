@@ -7,12 +7,15 @@ export type KitchenSink = {
   pushUnimplementedPromise?: () => Promise<void>
   pull: () => boolean
   pullPromise: () => Promise<boolean>
-  pullArgs: (a: number, b: Buffer|Uint8Array) => number
+  pullArgs: (a: number, b: number) => number
   pullTimeout: () => any
   pullUninmplemented?: () => number
   pullUninmplementedPromise?: () => number
 }
 
-export const createKitchenSink = () => ({
-
+export const createKitchenSink = ():KitchenSink => ({
+  pullArgs: (a: number, b: number) => {
+    console.log('[kitchensink] pullArgs', { a, b })
+    return a + b
+  }
 })

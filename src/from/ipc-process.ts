@@ -10,6 +10,10 @@ export function ipcProcessRpc<T extends RPC.Handler> (proc: ChildProcess) {
     attach: route => {
       proc.on('message', route)
       return () => proc.removeListener('message', route)
+    },
+    decode (x: any) {
+      console.log('[decode]', x)
+      return x
     }
   })
 }
