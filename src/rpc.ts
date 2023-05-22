@@ -100,9 +100,11 @@ export function createRpc<RemoteHandler extends RPC.Handler> (options: RPC.RpcOp
       emitter.emit(method, params)
     } else {
       // invalid
+      if (options.ignoreInvalidMessages) return
       const err: any = new Error('Invalid RPC message!')
       err.message = payload
       throw err
+      // console.warn(err.message)
     }
   }
 
@@ -111,12 +113,12 @@ export function createRpc<RemoteHandler extends RPC.Handler> (options: RPC.RpcOp
     emitter.on(method, async (params, cb) => {
       if (typeof cb !== 'function') {
         // handle notification
-        fn(params)
+        fn(...params)
         return 
       }
       // handle request
       try {
-        const result = await fn(params)
+        const result = await fn(...params)
         cb(undefined, result)
       } catch (error) {
         const { name, message, stack } = <any>error
@@ -127,13 +129,13 @@ export function createRpc<RemoteHandler extends RPC.Handler> (options: RPC.RpcOp
 
   const proxyRequest = <Requests>new Proxy({}, {
     get(target, prop: string, receiver) {
-      return params => request(<any>prop, params)
+      return (...params) => request(<any>prop, params)
     }
   })
 
   const proxyNotify = <Notifications>new Proxy({}, {
     get(target, prop: string, receiver) {
-      return params => notify(<any>prop, params)
+      return (...params) => notify(<any>prop, params)
     }
   })
 
@@ -146,22 +148,26 @@ export function createRpc<RemoteHandler extends RPC.Handler> (options: RPC.RpcOp
   }
 
   /** handles own methods of a given object */
-  function wrap (proxy: any) {
-    const props = getMethods(proxy) // Object.getOwnPropertyNames(proxy)
+  function wrap (proxy: any, depth = 1) {
+    const props = getMethods(proxy, depth) // Object.getOwnPropertyNames(proxy)
     for (const prop of props) {
       if (typeof proxy[prop] !== 'function') continue
       log('wrap', proxy.constructor?.name, prop)
       handle(prop, proxy[prop].bind(proxy))
     }
+    return rpc
   }
 
-  return {
+  const rpc = {
     handle,
     wrap,
     notify: proxyNotify,
     request: proxyRequest,
-    close
+    close,
+    emitter
   }
+
+  return rpc
 }
 
 class RpcError extends Error {
