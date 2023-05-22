@@ -6,7 +6,7 @@ export function rpcsFromEventEmitters<L extends RPC.Handler, R extends RPC.Handl
   const [l, r] = [new EventEmitter(), new EventEmitter()]
   const local = eventEmittersRpc<R>(l, r)
   const remote = eventEmittersRpc<L>(r, l)
-  local.wrap(localHandler)
-  remote.wrap(remoteHandler)
+  local.wrap(localHandler, 2)
+  remote.wrap(remoteHandler, 2)
   return { local, remote }
 }

@@ -44,6 +44,7 @@ namespace RPC {
     /** request timeout in milliseconds  */
     timeout?: number
     handler?: Record<string, Function> // (...args: any[]) => any
+    ignoreInvalidMessages?: boolean
   }
 
   interface Payload {
