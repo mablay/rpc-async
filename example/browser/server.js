@@ -23,6 +23,8 @@ app.ws('/ws', function(ws, req) {
     log: console.log,
     add: (a, b) => Promise.resolve(a + b)
   })
+  client.request.time('foo').then(console.log)
+  client.notify.chat('hello world!')
 })
 
 app.listen(3000)
