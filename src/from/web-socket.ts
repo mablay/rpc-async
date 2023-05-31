@@ -1,5 +1,5 @@
 import { createRpc } from '../rpc'
-import type { WebSocket as NodeWebSocket } from 'ws'
+import type NodeWebSocket from 'ws'
 
 /** Isomorphic implementation for
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API browser WebSockets}
