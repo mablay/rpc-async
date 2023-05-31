@@ -20,8 +20,13 @@ export function webSocketRpc<RemoteHandler extends RPC.Handler> (ws: WebSocket |
     const node = typeof process !== 'undefined' && !!process?.versions?.node
     const binaryType = node ? 'nodebuffer' : 'arraybuffer'
     const convert = node
-      ? (buffer: Buffer) => buffer
-      : (arrayBuffer: ArrayBuffer) => { return new Uint8Array(arrayBuffer) }
+    ? (buffer: Buffer) => buffer
+    : (arrayBuffer: ArrayBuffer) => {
+        // TODO: this should be decided when the convert function is created
+        //       not during its runtime.
+        //       double check implementations for npm:ws and browser:WebSocket
+        return typeof arrayBuffer === 'string' ? arrayBuffer : new Uint8Array(arrayBuffer)
+      }
 
     (<any>ws).binaryType = binaryType
     return createRpc<RemoteHandler>({
