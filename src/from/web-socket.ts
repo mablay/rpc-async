@@ -1,5 +1,6 @@
 import { createRpc } from '../rpc'
 import type NodeWebSocket from 'ws'
+import { Codec, Handler } from '../types'
 
 /** Isomorphic implementation for
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API browser WebSockets}
@@ -16,7 +17,7 @@ import type NodeWebSocket from 'ws'
  * 
  * JSON will be used as default codec unless you provide another.
  */
-export function webSocketRpc<RemoteHandler extends RPC.Handler> (ws: WebSocket | NodeWebSocket, codec?: RPC.Codec) {
+export function webSocketRpc<RemoteHandler extends Handler> (ws: WebSocket | NodeWebSocket, codec?: Codec) {
     const node = typeof process !== 'undefined' && !!process?.versions?.node
     const binaryType = node ? 'nodebuffer' : 'arraybuffer'
     const convert = node

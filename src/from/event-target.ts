@@ -1,4 +1,5 @@
 import { createRpc } from '../rpc'
+import { Handler } from '../types'
 
 /**
  * This implementation is meant for testing.
@@ -9,7 +10,7 @@ import { createRpc } from '../rpc'
  * EventTarget & Event are native to the browser.
  * NodeJS introduced them in v14.5
  */
-export function eventTargetsRpc<T extends RPC.Handler> (a: EventTarget, b: EventTarget) {
+export function eventTargetsRpc<T extends Handler> (a: EventTarget, b: EventTarget) {
   class CustomEvent extends Event {
     detail: any
     constructor(message, data) {

@@ -1,4 +1,3 @@
-/// <reference path="../types.d.ts" />
 import test from 'node:test'
 import { equal } from 'node:assert'
 import { Alice, Bob, rpcsFromEventEmitters } from './fixtures'

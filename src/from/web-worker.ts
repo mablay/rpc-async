@@ -1,6 +1,7 @@
 import { createRpc } from '../rpc'
+import { Handler } from '../types'
 
-export function webWorkerRpc<T extends RPC.Handler> (worker: Worker) {
+export function webWorkerRpc<T extends Handler> (worker: Worker) {
   return createRpc<T>({
     send: data => worker.postMessage(data),
     attach: route => {

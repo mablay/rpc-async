@@ -1,9 +1,8 @@
-/// <reference path="../types.d.ts" />
 import test from 'node:test'
 import { equal } from 'node:assert'
 import cluster from 'node:cluster'
 import { createKitchenSink, KitchenSink } from './fixtures'
-import { ipcProcessRpc } from '../src/from/ipc-process'
+import { ipcProcessRpc } from '../dist'
 
 test ('inter process communication', async t => {
 

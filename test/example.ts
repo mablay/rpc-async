@@ -1,6 +1,7 @@
 import { createRpc } from '..'
+import { Handler } from '../dist'
 
-interface Remote extends RPC.Handler {
+interface Remote extends Handler {
   /** REQUEST but with promisified call signature */
   add: (a: number, b: number) => number
   /** REQUEST, since it returns a non void promise */

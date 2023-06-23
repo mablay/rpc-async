@@ -1,8 +1,7 @@
-/// <reference path="../types.d.ts" />
-
 import { EventEmitter } from '@occami/events'
 import { defaultIdGen } from './id-gen'
 import { createLogger } from './log'
+import { Handler, Payload, PickNotifications, PromisifyRequests, ResponseMapValue, RpcOptions } from './types'
 
 const log = createLogger()
 
@@ -14,11 +13,11 @@ const log = createLogger()
   But it has a lot of business logic involved. Maybe a benchmark will show
   if we can ditch @occami/events for it.
 */
-export function createRpc<RemoteHandler extends RPC.Handler> (options: RPC.RpcOptions) {
+export function createRpc<RemoteHandler extends Handler> (options: RpcOptions) {
   type T = RemoteHandler
-  type Notifications = RPC.PickNotifications<T>
+  type Notifications = PickNotifications<T>
   type NotifyMethods = keyof Notifications
-  type Requests = RPC.PromisifyRequests<T>
+  type Requests = PromisifyRequests<T>
   type RequestMethods = keyof Requests
   
   // timeout: number
@@ -28,7 +27,7 @@ export function createRpc<RemoteHandler extends RPC.Handler> (options: RPC.RpcOp
   // idgen: () => string
 
   const timeout = options.timeout ?? 30000 // 30s as default timeout for requests
-  const resMap = new Map<string, RPC.ResponseMapValue>() // maps response to requests
+  const resMap = new Map<string, ResponseMapValue>() // maps response to requests
   const { send, attach } = options
   const idgen = options.idgen ?? defaultIdGen
   const encode = (typeof options.encode === 'function') ? options.encode : (x:any) => x
@@ -68,7 +67,7 @@ export function createRpc<RemoteHandler extends RPC.Handler> (options: RPC.RpcOp
   }
 
   // route incomming messages (notification, request, response)
-  function route (payload: RPC.Payload) {
+  function route (payload: Payload) {
     log('route', payload)
     const { id, method, params, result, error } = payload
     if (result !== undefined || error !== undefined) {

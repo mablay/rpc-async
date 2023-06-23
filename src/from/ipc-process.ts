@@ -2,6 +2,7 @@ import type { ChildProcess } from 'node:child_process'
 import { createRpc } from '../rpc'
 import type { Worker } from 'node:cluster'
 import { inspect } from 'node:util'
+import { Handler } from '../types'
 
 /**
  * IPC may involve RPC unrelated communication that needs to be
@@ -10,7 +11,7 @@ import { inspect } from 'node:util'
  */
 const RPC_SYMBOL = '🌈'
 
-export function ipcProcessRpc<T extends RPC.Handler> (proc: ChildProcess | Worker | NodeJS.Process) {
+export function ipcProcessRpc<T extends Handler> (proc: ChildProcess | Worker | NodeJS.Process) {
   if (proc.send === undefined) {
     throw new Error('Process was not spawned with an IPC channel! Won\'t be able to use `process.send`!')
   }

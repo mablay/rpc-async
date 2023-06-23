@@ -1,5 +1,6 @@
 import { EventEmitter } from '@occami/events'
 import { createRpc } from '../rpc'
+import { Handler } from '../types'
 
 /**
  * This implementation is meant for testing.
@@ -7,7 +8,7 @@ import { createRpc } from '../rpc'
  * Since both EventEmitters exist in the same execution context,
  * they can invoke their methods directly without the need of RPCs.
  */
-export function eventEmittersRpc<R extends RPC.Handler> (local: EventEmitter, remote: EventEmitter) {
+export function eventEmittersRpc<R extends Handler> (local: EventEmitter, remote: EventEmitter) {
   return createRpc<R>({
     send: req => remote.emit('rpc', req),
     attach: route => {
