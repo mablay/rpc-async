@@ -1,6 +1,6 @@
 // TODO: get rid of events pacakge
 import { EventEmitter } from '@occami/events'
-import { createRpc } from '../..'
+import { createRpc } from '../../index.js'
 import type { Handler } from '../types'
 
 /**

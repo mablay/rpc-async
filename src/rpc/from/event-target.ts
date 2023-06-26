@@ -1,4 +1,4 @@
-import { createRpc } from '../..'
+import { createRpc } from '../../index.js'
 import type { Handler } from '../types'
 
 /**

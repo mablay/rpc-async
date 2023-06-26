@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert'
-import { getMethods, getObjectMembers, getSafeMethods } from '../rpc/util'
+import { getSafeMethods } from '../rpc/util.js'
 
 class Foo { b () {} }
 class Bar extends Foo { c () {} }

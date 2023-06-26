@@ -1,8 +1,8 @@
 import { Socket } from "dgram"
-import { Handler } from "../types"
-import { createRpc } from "../router"
+import { createRpc } from "../../index.js"
+import type { Handler } from "../types"
 
-export function udpJsonRpc<T extends Handler>(socket: Socket, port?: number) {
+export function rpcFromUdp<T extends Handler>(socket: Socket, port?: number) {
   return createRpc<T>({
     send: (msg: any) => socket.send(msg, port),
     attach: (route) => {

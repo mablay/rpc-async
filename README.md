@@ -14,25 +14,68 @@ Features
 ## Usage
 
 ### Inter process communication
-`parent.js`
-```js
-import { Rpc } from 'rpc-async'
-import { fork } from 'child_process'
-const child = fork('./example/ipc-child.js')
-const rpc = Rpc.fromIpcProcess(child)
-rpc.handle('add', ([a, b]) => a + b) // also works with async functions
+`shared-type.ts`
+```ts
+/* optional shared interface */
+export type AddService = { add (a: number, b: number): number }
 ```
 
-`child.js`
-```js
-import { Rpc } from 'rpc-async'
-const rpc = Rpc.fromIpcProcess(process)
-rpc.request('add', [3, 5]).then(sum => {
+`parent.ts`
+```ts
+import { fork } from 'node:child_process'
+import { ipcProcessRpc } from 'rpc-async'
+import type { AddService } from './shared-type'
+
+const child = fork('./ipc-child.js')
+const rpc = ipcProcessRpc(child)
+rpc.expose<AddService>({
+  add: (a, b) => a + b
+})
+```
+
+`child.ts`
+```ts
+import { ipcProcessRpc } from 'rpc-async'
+import type { AddService } from './ipc-shared-type'
+
+const rpc = ipcProcessRpc<AddService>(process)
+rpc.request.add(3, 5).then((sum: number) => {
   console.log('3 + 5 =', sum)
   process.exit()
 })
 ```
 
+### Cluster
+
+This example shows how two processes use RPC over IPC.
+
+```ts
+import cluster from 'node:cluster'
+import { ipcProcessRpc } from 'rpc-async'
+
+/* optional interface gives you code completion and type safety */
+interface Server {
+  add: (a: number, b: number) => number
+  disconnect: () => void
+}
+
+if (cluster.isPrimary) {
+  const worker = cluster.fork()
+  const rpc = ipcProcessRpc(worker)
+  /* ✅ Generic type warns about incomplete API implementation */
+  rpc.expose<Server>({
+    add: (a: number, b: number) => a + b,
+    disconnect: () => cluster.disconnect()
+  })
+} else {
+  /* ✅ Generic type gives your code completion*/
+  const rpc = ipcProcessRpc<Server>(process)
+  const sum = await rpc.request.add(3, 4)
+  console.log('sum =', sum) // => 7
+  rpc.notify.disconnect()
+}
+
+```
 
 ## Developer Notes
 

@@ -1,7 +1,7 @@
 /*
  * Enqueue tasks with callbacks that can timeout
  */
-import defaultIdGenerator from './plugins/id-generator'
+import defaultIdGenerator from './plugins/id-generator.js'
 import type { Callback, Logger } from "./types"
 
 type Timeout = ReturnType<typeof setTimeout>

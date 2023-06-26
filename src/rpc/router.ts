@@ -4,11 +4,11 @@
  * receive & decode
  */
 
-import { createHandler } from './handler'
-import { network } from './network'
-import { createLogger } from './plugins/debug-logger'
-import { jobQueue } from './queue'
-import { RpcError } from './util'
+import { createHandler } from './handler.js'
+import { network } from './network.js'
+import { createLogger } from './plugins/debug-logger.js'
+import { jobQueue } from './queue.js'
+import { RpcError } from './util.js'
 import type { DetatchFn, Handler, Payload, PickNotifications, PromisifyRequests, RpcOptions, SendFn } from './types'
 
 export interface NetworkOptions {

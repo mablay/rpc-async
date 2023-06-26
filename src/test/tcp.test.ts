@@ -1,7 +1,7 @@
 import test from 'node:test'
 import { equal } from 'node:assert'
 import { AddressInfo, createConnection, createServer } from 'node:net'
-import { streamJsonRpc } from '../rpc/from/duplex-stream'
+import { rpcFromStream } from '../index.js'
 
 interface IClient {
   add (a: number, b: number): number
@@ -11,7 +11,7 @@ interface IClient {
 test ('Rpc over TCP connection', async t => {
   // create server
   const server = createServer(async socket => {
-    const rpc = streamJsonRpc<IClient>(socket)
+    const rpc = rpcFromStream<IClient>(socket)
     const sum = await rpc.request.add(3, 4)
     equal(sum, 7)
     rpc.notify.kill()
@@ -21,7 +21,7 @@ test ('Rpc over TCP connection', async t => {
 
   // create client
   const socket = createConnection({ port })
-  const rpc = streamJsonRpc(socket)
+  const rpc = rpcFromStream(socket)
   rpc.expose<IClient>({
     add: (a: number, b: number) => a + b,
     kill: () => socket.destroy()

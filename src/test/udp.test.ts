@@ -1,7 +1,7 @@
 import test from 'node:test'
 import { equal } from 'node:assert'
 import { Socket, createSocket } from 'node:dgram'
-import { udpJsonRpc } from '../rpc/from/udp-socket'
+import { rpcFromUdp } from '../index.js'
 
 interface IServer {
   add (a: number, b: number): number
@@ -13,14 +13,14 @@ test ('RPC over UDP connection', async t => {
   const client = await udpSocket()
 
   // --- PEER1 (let's call it server) --- //
-  const serverRpc = udpJsonRpc<IServer>(server.socket, client.port)
+  const serverRpc = rpcFromUdp<IServer>(server.socket, client.port)
   serverRpc.expose<IServer>({
     add: (a: number, b: number) => a + b,
     kill: () => { server.socket.close() }
   })
 
   // --- PEER2 (let's call it client) --- //
-  const clientRpc = udpJsonRpc<IServer>(client.socket, server.port)
+  const clientRpc = rpcFromUdp<IServer>(client.socket, server.port)
   const sum = await clientRpc.request.add(3, 4)
   equal(sum, 7)
   clientRpc.notify.kill()

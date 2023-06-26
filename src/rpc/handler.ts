@@ -1,4 +1,4 @@
-import { getMethods } from "./util"
+import { getMethods } from "./util.js"
 import type { Callback, Logger, Procedure } from "./types"
 
 export function createHandler (log: Logger) {
