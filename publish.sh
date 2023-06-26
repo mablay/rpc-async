@@ -11,10 +11,12 @@ echo "This script will increment the package version and publish it publicly"
 v="${1:-patch}"
 # rm -rf node_modules
 # npm install
+echo "cleaning..."
+npm run clean
 echo "building..."
 npm run build
 echo "testing..."
-npm test
+npm run test:js
 
 echo "Please review the packlist before publishing..."
 echo ""

@@ -15,8 +15,10 @@
   },
   "scripts": {
     "build": "tsc",
+    "clean": "rm -rf ./dist",
     "esbuild": "esbuild index.ts --bundle --platform=neutral --outfile=index.js",
     "test": "tsx --test-reporter spec --test src/test/*.test.ts",
+    "test:js": "node --test-reporter spec --test dist/test/*.test.js",
     "cloc": "npx clock index.js",
     "coverage": "npx c8 pta",
     "packlist": "npm pack --dry-run",
