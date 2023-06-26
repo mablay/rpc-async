@@ -28,9 +28,8 @@ case $yn in
   * ) echo "packlist rejected"; exit;;
 esac
 
-echo "npm version $v"
-# tag=`npm version $v`
-# echo "publishing ($tag)..."
-# git push && git push --tags
-# npm publish --access=public
-# echo "published $tag"
+tag=`npm version $v`
+echo "publishing ($tag)..."
+git push && git push --tags
+npm publish --access=public
+echo "published $tag"
