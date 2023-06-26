@@ -82,20 +82,20 @@ You can build your own RPC wrapper.
 
 ```ts
 /* -- pseudocode for an imaginary "com"unication channel -- */
-import { createRpc, type Handler } from "rpc-async";
+import { createRpc, type Handler } from 'rpc-async'
 
 export function myCustomRpc<T extends Handler>(com: any) {
   return createRpc<T>({
     /* required: send messages */
     send: (msg) => com.send(msg),
-    /* required: listen to and route incoming messages and return a detach function */
+    /* required: listen to and route incoming messages. Should return a detach function */
     attach: (route) => {
-      com.on("message", route);
-      return () => com.removeListener("message", route);
+      com.on("message", route)
+      return () => com.removeListener("message", route)
     },
     /* optional message codec, depending on the needs of your communication channel */
     encode: (obj: any) => JSON.stringify(obj),
-    decode: (text: string) => JSON.parse(text),
+    decode: (text: string) => JSON.parse(text)
   });
 }
 ```
