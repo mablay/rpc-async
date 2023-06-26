@@ -1,7 +1,0 @@
-export { createRpc } from './src/rpc'
-export { eventEmittersRpc } from './src/from/event-emitter'
-export { eventTargetsRpc } from './src/from/event-target'
-export { ipcProcessRpc } from './src/from/ipc-process'
-export { webSocketRpc } from './src/from/web-socket'
-export { webWorkerRpc } from './src/from/web-worker'
-export type { Handler, Codec } from './src/types'

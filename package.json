@@ -1,18 +1,22 @@
 {
   "name": "rpc-async",
   "version": "1.0.1",
-  "description": "Augments async communication with RPC functionality (ws, events, ipc, ...)",
+  "description": "Wraps typesafe RPCs (remote procedure calls) around message based protocols. Support for WebSocket, WebWorker, IPC, TCP, UDP, ...",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
-  "files": ["dist/**"],
+  "files": [
+    "dist/index.*",
+    "dist/rpc/*",
+    "!*.map"
+  ],
   "engines": {
     "node": ">=8"
   },
   "scripts": {
     "build": "tsc",
     "esbuild": "esbuild index.ts --bundle --platform=neutral --outfile=index.js",
-    "test": "tsx --test-reporter spec --test test/*.test.ts",
+    "test": "tsx --test-reporter spec --test src/test/*.test.ts",
     "cloc": "npx clock index.js",
     "coverage": "npx c8 pta",
     "packlist": "npm pack --dry-run",
@@ -26,7 +30,6 @@
     "@types/node": "^18.15.11",
     "esbuild": "^0.15.13",
     "node": "^19.8.1",
-    "pta": "^1.0.2",
     "tap-spec": "^5.0.0",
     "tsx": "^3.12.7",
     "typescript": "^4.9.5",

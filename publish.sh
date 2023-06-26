@@ -3,6 +3,9 @@
 ## Synopsis
 ## ./deploy.sh [major|minor|patch]
 
+# exit when any command fails
+set -e
+
 echo "This script will increment the package version and publish it publicly"
 
 v="${1:-patch}"
@@ -23,8 +26,9 @@ case $yn in
   * ) echo "packlist rejected"; exit;;
 esac
 
-tag=`npm version $v`
-echo "publishing ($tag)..."
-git push && git push --tags
-npm publish --access=public
-echo "published $tag"
+echo "npm version $v"
+# tag=`npm version $v`
+# echo "publishing ($tag)..."
+# git push && git push --tags
+# npm publish --access=public
+# echo "published $tag"
