@@ -1,5 +1,4 @@
-import { createRpc } from '../index.js'
-import type { Handler } from '..'
+import { createRpc, type Handler } from '../index.js'
 
 interface Remote extends Handler {
   /** REQUEST but with promisified call signature */

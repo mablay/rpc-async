@@ -56,38 +56,45 @@ if (cluster.isPrimary) {
 }
 ```
 
-### RPC over IPC - child process
-`shared-type.ts`
+## API
+
+### Templates
+
+* rpcFromStream ([source](src/rpc/from/duplex-stream.ts) | [test](src/test/tcp.test.ts))
+* rpcFromIpc ([source](src/rpc/from/ipc-process.ts) | [test](src/test/ipc.test.ts))
+* rpcFromUdp ([source](src/rpc/from/udp-socket.ts) | [test](src/test/udp.test.ts))
+* rpcFromWebSocket ([source](src/rpc/from/web-socket.ts) | TODO )
+* rpcFromWebWorker ([source](src/rpc/from/web-worker.ts) | TODO )
+
+### User defined RPC template
+
+If you have a communication channel that allows you to
+
+* send messages
+* listen to incoming messages
+* remove your listener (optional, but recommended)
+
+You can build your own RPC wrapper.
+
 ```ts
-/* optional shared interface */
-export type AddService = { add (a: number, b: number): number }
+/* -- pseudocode for an imaginary "com"unication channel -- */
+import { createRpc, type Handler } from "rpc-async"
+
+export function myCustomRpc<T extends Handler>(com: any) {
+  return createRpc<T>({
+    /* required: send messages */
+    send: msg => com.send(msg),
+    /* required: listen to and route incoming messages and return a detach function */
+    attach: (route) => {
+      com.on('message', route)
+      return () => com.removeListener('message', route)
+    },
+    /* optional message codec, depending on the needs of your communication channel */
+    encode: (obj: any) => JSON.stringify(obj),
+    decode: (text: string) => JSON.parse(text)
+  })
+}
 ```
-
-`parent.ts`
-```ts
-import { fork } from 'node:child_process'
-import { rpcFromIpc } from 'rpc-async'
-import type { AddService } from './shared-type'
-
-const child = fork('./ipc-child.js')
-const rpc = rpcFromIpc(child)
-rpc.expose<AddService>({
-  add: (a, b) => a + b
-})
-```
-
-`child.ts`
-```ts
-import { rpcFromIpc } from 'rpc-async'
-import type { AddService } from './ipc-shared-type'
-
-const rpc = rpcFromIpc<AddService>(process)
-rpc.request.add(3, 5).then((sum: number) => {
-  console.log('3 + 5 =', sum)
-  process.exit()
-})
-```
-
 
 ## Developer Notes
 
