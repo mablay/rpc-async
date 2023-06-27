@@ -1,4 +1,4 @@
-import { createRpc } from '../../index.js'
+import { createRpc } from '../../browser.js'
 import type { Handler } from '../types'
 
 export function rpcFromWebWorker<T extends Handler> (worker: Worker) {

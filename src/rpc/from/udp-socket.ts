@@ -1,6 +1,6 @@
-import { Socket } from "dgram"
-import { createRpc } from "../../index.js"
-import type { Handler } from "../types"
+import { Socket } from 'dgram'
+import { createRpc } from '../../index.js'
+import type { Handler } from '../types'
 
 export function rpcFromUdp<T extends Handler>(socket: Socket, port?: number) {
   return createRpc<T>({

@@ -2,11 +2,13 @@
   "name": "rpc-async",
   "version": "2.0.0",
   "description": "Isomorphic async RPCs on top of message based communication protocols. Support for WebSocket, WebWorker, IPC, TCP, UDP, ...",
-  "main": "dist/index.js",
+  "main": "dist/browser.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "files": [
     "dist/index.*",
+    "dist/browser.*",
     "dist/rpc/*",
     "!*.map"
   ],
@@ -19,8 +21,8 @@
     "esbuild": "esbuild index.ts --bundle --platform=neutral --outfile=index.js",
     "test": "tsx --test-reporter spec --test src/test/*.test.ts",
     "test:js": "node --test-reporter spec --test dist/test/*.test.js",
-    "cloc": "npx clock index.js",
-    "coverage": "npx c8 pta",
+    "browser": "node src/example/browser/server.js",
+    "coverage": "npx c8 npm test",
     "packlist": "npm pack --dry-run",
     "deploy": "./publish.sh",
     "cluster": "esbuild example/cluster.ts --bundle --format=esm --platform=node --outdir=build && node build/cluster.js"
@@ -28,8 +30,6 @@
   "devDependencies": {
     "@types/node": "^18.15.11",
     "esbuild": "^0.15.13",
-    "node": "^19.8.1",
-    "tap-spec": "^5.0.0",
     "tsx": "^3.12.7",
     "typescript": "^4.9.5",
     "ws": "^8.11.0"

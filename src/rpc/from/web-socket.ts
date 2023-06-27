@@ -1,4 +1,4 @@
-import { createRpc } from '../../index.js'
+import { createRpc } from '../../browser.js'
 import type NodeWebSocket from 'ws'
 import type { Codec, Handler } from '../types'
 
