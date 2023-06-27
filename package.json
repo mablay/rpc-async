@@ -21,7 +21,7 @@
     "test": "tsx --test-reporter spec --test src/test/*.test.ts",
     "test:js": "node --test-reporter spec --test dist/test/*.test.js",
     "browser": "node src/example/browser/server.js",
-    "esbuild": "npx esbuild index.ts --bundle --platform=neutral --outfile=index.js",
+    "esbuild": "npx esbuild src/index.ts --bundle --minify --platform=neutral --external:node:readline --external:node:os --outfile=index.js",
     "coverage": "npx c8 npm test",
     "packlist": "npm pack --dry-run",
     "deploy": "./publish.sh"

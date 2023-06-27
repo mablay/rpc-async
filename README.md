@@ -20,6 +20,9 @@ Out of the box support for:
 - NodeJS and Browser support
 - TypeScript support
 
+The package contains well formated JS files and TypeScript declarations.
+Once bundled and minified (e.g. using esbuild) it boils down to tiny ~4kb.
+
 ## Usage
 
 ### RPC over IPC in a cluster
@@ -99,6 +102,9 @@ export function myCustomRpc<T extends Handler>(com: any) {
   });
 }
 ```
+
+This pseudocode is quite similar to the templates listed above. Usually the communication
+channels have quite similar APIs and only slight adjustments are required.
 
 ## Developer Notes
 
