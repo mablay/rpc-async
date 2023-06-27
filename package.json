@@ -17,22 +17,19 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rm -rf ./dist",
-    "esbuild": "esbuild index.ts --bundle --platform=neutral --outfile=index.js",
+    "clean": "rm -rf ./dist; rm -rf coverage",
     "test": "tsx --test-reporter spec --test src/test/*.test.ts",
     "test:js": "node --test-reporter spec --test dist/test/*.test.js",
     "browser": "node src/example/browser/server.js",
+    "esbuild": "npx esbuild index.ts --bundle --platform=neutral --outfile=index.js",
     "coverage": "npx c8 npm test",
     "packlist": "npm pack --dry-run",
-    "deploy": "./publish.sh",
-    "cluster": "esbuild example/cluster.ts --bundle --format=esm --platform=node --outdir=build && node build/cluster.js"
+    "deploy": "./publish.sh"
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
-    "esbuild": "^0.15.13",
-    "tsx": "^3.12.7",
-    "typescript": "^4.9.5",
-    "ws": "^8.11.0"
+    "ws": "^8.5.5",
+    "typescript": "^4.9.5"
   },
   "keywords": [
     "rpc",
