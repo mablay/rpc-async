@@ -1,6 +1,6 @@
 {
   "name": "rpc-async",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Isomorphic async RPCs on top of message based communication protocols. Support for WebSocket, WebWorker, IPC, TCP, UDP, ...",
   "browser": "dist/browser.js",
   "main": "dist/index.js",
